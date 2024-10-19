@@ -1,0 +1,51 @@
+services:
+  nginx-short-link:
+    container_name: nginx-short-link
+    image: nginx:1.24
+    restart: "no"
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/
+      - ./.docker/config/nginx/:/etc/nginx/conf.d/
+      - ./.docker/logs/nginx:/var/log/nginx/
+    networks:
+      - web-network-short-link
+
+  php-short-link:
+    build:
+      context: ./.docker
+    container_name: php-short-link
+    restart: no
+    working_dir: /var/www
+    volumes:
+      - .:/var/www/
+    networks:
+      - web-network-short-link
+
+  mysql-short-link:
+    container_name: mysql-short-link
+    image: mysql:8.4.3
+    restart: no
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./logs/mysql/:/var/logs/mysql
+      - db-short-link:/var/lib/mysql
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER:  ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - web-network-short-link
+
+volumes:
+    db-short-link:
+        name: db-short-link
+
+networks:
+  web-network-short-link:
+    driver: bridge
