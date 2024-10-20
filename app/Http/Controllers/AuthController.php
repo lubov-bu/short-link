@@ -43,6 +43,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Возникла ошибка при входе'], 500);
         }
 
-        return response()->json(['bearer' => $token]);
+        return response()->json($token->original);
     }
 }
